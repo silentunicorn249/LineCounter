@@ -20,9 +20,9 @@ def getDir(dir, extensions, directories):
 					lines = len(f.readlines())
 					if show: 
 						print(f"file {dir+'/'+i,'r'} has {lines} lines")
-						
-					logs.write(f"file {dir+'/'+i,'r'} has {lines} lines\n")
-					fsync(logs.fileno())
+					if save:
+						logs.write(f"file {dir+'/'+i,'r'} has {lines} lines\n")
+						fsync(logs.fileno())
 					count+=lines
 				# file is binary
 				except UnicodeDecodeError:
@@ -38,19 +38,21 @@ if not show or show =="y" or show == "yes":
 	show = True
 else:
 	show = False
-	
-no = 0
-while 1:
-	logname = f"logs-{no}.txt"
-	file = Path(logname)
-	if not file.is_file():
-		logs = open(logname, 'w+')
-		break
-	no+=1
-		
+if not save or save =="y" or save == "yes":
+	save = True
+	no = 0
+	while 1:
+		logname = f"logs-{no}.txt"
+		file = Path(logname)
+		if not file.is_file():
+			logs = open(logname, 'w+')
+			break
+		no+=1
+else:
+	save = False
 
 count = getDir(dir, files, directories)
-
-logs.write(f"Total lines: {count}\n")
-logs.close()
+if save:
+	logs.write(f"Total lines: {count}\n")
+	logs.close()
 print(f"Total lines: {count}\n")
