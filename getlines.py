@@ -3,11 +3,12 @@ from os.path import isdir
 from pathlib import Path
 
 
-def getDir(dir, extensions):
+def getDir(dir, extensions, directories):
 	count=0
 	for i in listdir(dir):
 		if isdir(dir+'/'+i):
-			count += getDir(dir+"/"+i, extensions)
+			if i not in directories:
+				count += getDir(dir+"/"+i, extensions, directories)
 		else:
 			included_ext = [y for y in map( lambda x: i.endswith("."+x), extensions)]
 			if any(included_ext):
@@ -27,6 +28,7 @@ def getDir(dir, extensions):
 
 dir = input("Enter directory: ")
 files = input("Enter file types seperated by space: ").split()
+directories = input("Enter excluded directories: ").split()
 no = 0
 while 1:
 	logname = f"logs-{no}.txt"
@@ -38,7 +40,7 @@ while 1:
 	no+=1
 
 
-count = getDir(dir, files)
+count = getDir(dir, files, directories)
 logs.write(f"Total lines: {count}\n")
 print(f"Total lines: {count}\n")
 logs.close()
